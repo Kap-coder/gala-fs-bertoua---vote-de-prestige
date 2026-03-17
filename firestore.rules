@@ -61,24 +61,27 @@ service cloud.firestore {
       allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && 
         (request.resource.data.role == 'user' || 
          (request.resource.data.role == 'admin' && request.auth.token.email == "angekapel007@gmail.com" && request.auth.token.email_verified == true));
-      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasVoted']) && resource.data.hasVoted == false);
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasVoted']));
     }
 
     match /candidates/{candidateId} {
       allow read: if isAuthenticated();
       allow write: if isAdmin();
       
-      // Special rule for incrementing vote count via batch/transaction
+      // Special rule for incrementing/decrementing vote count via batch/transaction
       allow update: if isAuthenticated() && 
                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voteCount']) &&
-                    request.resource.data.voteCount == resource.data.voteCount + 1;
+                    (request.resource.data.voteCount == resource.data.voteCount + 1 || 
+                     request.resource.data.voteCount == resource.data.voteCount - 1);
     }
 
     match /votes/{voteId} {
-      allow read: if isAdmin();
+      allow read: if isAdmin() || isOwner(voteId);
       allow create: if isAuthenticated() && 
+                    isOwner(voteId) &&
                     isValidVote(request.resource.data) &&
                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.hasVoted == false;
+      allow delete: if isAdmin() || isOwner(voteId);
     }
 
     match /admin_emails/{email} {

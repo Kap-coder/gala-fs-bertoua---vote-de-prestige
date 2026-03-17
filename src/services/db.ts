@@ -1,15 +1,16 @@
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  setDoc, 
-  updateDoc, 
-  increment, 
-  writeBatch, 
-  onSnapshot, 
-  query, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  increment,
+  writeBatch,
+  onSnapshot,
+  query,
   orderBy,
+  where,
   Timestamp,
   deleteDoc,
   addDoc
@@ -79,7 +80,25 @@ export const dbService = {
 
   async deleteCandidate(id: string) {
     try {
-      await deleteDoc(doc(db, 'candidates', id));
+      const batch = writeBatch(db);
+
+      // 1. Find all votes for this candidate
+      const votesQuery = query(collection(db, 'votes'), where('candidateId', '==', id));
+      const votesSnapshot = await getDocs(votesQuery);
+
+      // 2. For each vote, reset user's hasVoted status and delete the vote
+      for (const voteDoc of votesSnapshot.docs) {
+        const voteData = voteDoc.data();
+        const userRef = doc(db, 'users', voteData.userId);
+        batch.update(userRef, { hasVoted: false });
+        batch.delete(voteDoc.ref);
+      }
+
+      // 3. Delete the candidate
+      const candidateRef = doc(db, 'candidates', id);
+      batch.delete(candidateRef);
+
+      await batch.commit();
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `candidates/${id}`);
     }
@@ -117,9 +136,9 @@ export const dbService = {
   async castVote(userId: string, candidateId: string) {
     try {
       const batch = writeBatch(db);
-      
-      // 1. Create vote record
-      const voteRef = doc(collection(db, 'votes'));
+
+      // 1. Create vote record (using userId as ID to ensure one vote per user)
+      const voteRef = doc(db, 'votes', userId);
       batch.set(voteRef, {
         userId,
         candidateId,
@@ -141,6 +160,43 @@ export const dbService = {
       await batch.commit();
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'batch-vote');
+    }
+  },
+
+  async cancelVote(userId: string, candidateId: string) {
+    try {
+      const batch = writeBatch(db);
+
+      // 1. Delete vote record
+      const voteRef = doc(db, 'votes', userId);
+      batch.delete(voteRef);
+
+      // 2. Decrement candidate vote count
+      const candidateRef = doc(db, 'candidates', candidateId);
+      batch.update(candidateRef, {
+        voteCount: increment(-1)
+      });
+
+      // 3. Mark user as not voted
+      const userRef = doc(db, 'users', userId);
+      batch.update(userRef, {
+        hasVoted: false
+      });
+
+      await batch.commit();
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'batch-cancel-vote');
+    }
+  },
+
+  async getUserVote(userId: string): Promise<Vote | null> {
+    try {
+      const docRef = doc(db, 'votes', userId);
+      const snapshot = await getDoc(docRef);
+      return snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as Vote) : null;
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, `votes/${userId}`);
+      return null;
     }
   },
 

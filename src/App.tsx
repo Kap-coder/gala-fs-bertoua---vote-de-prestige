@@ -4,13 +4,13 @@ import { authService } from './services/auth';
 import { dbService } from './services/db';
 import { UserProfile, Candidate, Vote } from './types';
 import { Toaster, toast } from 'react-hot-toast';
-import { 
-  Vote as VoteIcon, 
-  LayoutDashboard, 
-  LogOut, 
-  Users, 
-  Trophy, 
-  CheckCircle2, 
+import {
+  Vote as VoteIcon,
+  LayoutDashboard,
+  LogOut,
+  Users,
+  Trophy,
+  CheckCircle2,
   AlertCircle,
   Plus,
   Trash2,
@@ -21,13 +21,13 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   Cell
 } from 'recharts';
@@ -36,7 +36,7 @@ import {
 
 const Loader = () => (
   <div className="flex items-center justify-center min-h-screen bg-slate-50">
-    <motion.div 
+    <motion.div
       animate={{ rotate: 360 }}
       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
       className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full"
@@ -44,9 +44,9 @@ const Loader = () => (
   </div>
 );
 
-const Navbar = ({ user, profile, onLogout, view, setView }: { 
-  user: User | null, 
-  profile: UserProfile | null, 
+const Navbar = ({ user, profile, onLogout, view, setView }: {
+  user: User | null,
+  profile: UserProfile | null,
   onLogout: () => void,
   view: 'vote' | 'admin',
   setView: (v: 'vote' | 'admin') => void
@@ -60,18 +60,18 @@ const Navbar = ({ user, profile, onLogout, view, setView }: {
           </div>
           <span className="font-serif text-2xl font-black gold-gradient hidden sm:block tracking-tighter">FS Bertoua</span>
         </div>
-        
+
         {user && (
           <div className="flex items-center gap-6">
             {profile?.role === 'admin' && (
               <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                <button 
+                <button
                   onClick={() => setView('vote')}
                   className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${view === 'vote' ? 'bg-gold-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}
                 >
                   Voter
                 </button>
-                <button 
+                <button
                   onClick={() => setView('admin')}
                   className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${view === 'admin' ? 'bg-gold-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}
                 >
@@ -83,7 +83,7 @@ const Navbar = ({ user, profile, onLogout, view, setView }: {
               <p className="text-sm font-bold text-white">{profile?.name}</p>
               <p className="text-[10px] text-gold-500 uppercase tracking-[0.2em] font-black">{profile?.role}</p>
             </div>
-            <button 
+            <button
               onClick={onLogout}
               className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
               title="Déconnexion"
@@ -97,13 +97,13 @@ const Navbar = ({ user, profile, onLogout, view, setView }: {
   </nav>
 );
 
-const CandidateCard: React.FC<{ 
-  candidate: Candidate; 
-  onVote: (id: string) => void; 
+const CandidateCard: React.FC<{
+  candidate: Candidate;
+  onVote: (id: string) => void;
   disabled: boolean;
   hasVoted: boolean;
 }> = ({ candidate, onVote, disabled, hasVoted }) => (
-  <motion.div 
+  <motion.div
     layout
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -111,17 +111,17 @@ const CandidateCard: React.FC<{
     className="glass-card rounded-[2rem] overflow-hidden group relative"
   >
     <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden">
-      <img 
-        src={candidate.image || `https://picsum.photos/seed/${candidate.id}/800/1000`} 
+      <img
+        src={candidate.image || `https://picsum.photos/seed/${candidate.id}/800/1000`}
         alt={candidate.name}
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         referrerPolicy="no-referrer"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60" />
-      
+
       {hasVoted && (
         <div className="absolute inset-0 bg-gold-500/10 backdrop-blur-[2px] flex items-center justify-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="bg-gold-500 text-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(234,179,8,0.4)] flex items-center gap-2"
@@ -140,17 +140,16 @@ const CandidateCard: React.FC<{
         </p>
       </div>
     </div>
-    
+
     <div className="p-6 bg-white/5 border-t border-white/10">
       {!hasVoted && (
         <button
           onClick={() => onVote(candidate.id)}
           disabled={disabled}
-          className={`w-full py-4 px-6 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all flex items-center justify-center gap-2 ${
-            disabled 
-            ? 'bg-white/5 text-slate-500 cursor-not-allowed' 
-            : 'gold-button hover:scale-[1.02] active:scale-95'
-          }`}
+          className={`w-full py-4 px-6 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all flex items-center justify-center gap-2 ${disabled
+              ? 'bg-white/5 text-slate-500 cursor-not-allowed'
+              : 'gold-button hover:scale-[1.02] active:scale-95'
+            }`}
         >
           {disabled ? 'Traitement...' : 'Voter maintenant'}
         </button>
@@ -159,8 +158,8 @@ const CandidateCard: React.FC<{
   </motion.div>
 );
 
-const AdminPanel = ({ candidates, users, votes }: { 
-  candidates: Candidate[]; 
+const AdminPanel = ({ candidates, users, votes }: {
+  candidates: Candidate[];
   users: UserProfile[];
   votes: Vote[];
 }) => {
@@ -218,25 +217,25 @@ const AdminPanel = ({ candidates, users, votes }: {
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap gap-2 p-1.5 bg-white/5 rounded-2xl w-fit border border-white/10">
-        <button 
+        <button
           onClick={() => setActiveTab('stats')}
           className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'stats' ? 'bg-gold-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}
         >
           <BarChart3 className="w-4 h-4 inline mr-2" /> Statistiques
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('candidates')}
           className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'candidates' ? 'bg-gold-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}
         >
           <Trophy className="w-4 h-4 inline mr-2" /> Candidats
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('users')}
           className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'users' ? 'bg-gold-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}
         >
           <Users className="w-4 h-4 inline mr-2" /> Participants
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('admins')}
           className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'admins' ? 'bg-gold-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}
         >
@@ -246,7 +245,7 @@ const AdminPanel = ({ candidates, users, votes }: {
 
       <AnimatePresence mode="wait">
         {activeTab === 'stats' && (
-          <motion.div 
+          <motion.div
             key="stats"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -261,7 +260,7 @@ const AdminPanel = ({ candidates, users, votes }: {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }} />
-                    <Tooltip 
+                    <Tooltip
                       cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                       contentStyle={{ backgroundColor: '#0f172a', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.5)' }}
                     />
@@ -274,7 +273,7 @@ const AdminPanel = ({ candidates, users, votes }: {
                 </ResponsiveContainer>
               </div>
             </div>
-            
+
             <div className="space-y-6">
               <div className="gold-button p-8 rounded-[2rem] text-black shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-110 transition-transform">
@@ -295,7 +294,7 @@ const AdminPanel = ({ candidates, users, votes }: {
         )}
 
         {activeTab === 'candidates' && (
-          <motion.div 
+          <motion.div
             key="candidates"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -307,33 +306,33 @@ const AdminPanel = ({ candidates, users, votes }: {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-[10px] font-black text-gold-500 uppercase tracking-widest mb-2">Nom de la Candidate</label>
-                    <input 
-                      type="text" 
-                      placeholder="Ex: Marie Dupont" 
+                    <input
+                      type="text"
+                      placeholder="Ex: Marie Dupont"
                       className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-2xl text-white focus:ring-2 focus:ring-gold-500 outline-none transition-all"
                       value={newCandidate.name}
-                      onChange={e => setNewCandidate({...newCandidate, name: e.target.value})}
+                      onChange={e => setNewCandidate({ ...newCandidate, name: e.target.value })}
                     />
                   </div>
                   <div>
                     <label className="block text-[10px] font-black text-gold-500 uppercase tracking-widest mb-2">Description / Bio</label>
-                    <textarea 
-                      placeholder="Parlez-nous d'elle..." 
+                    <textarea
+                      placeholder="Parlez-nous d'elle..."
                       rows={3}
                       className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-2xl text-white focus:ring-2 focus:ring-gold-500 outline-none transition-all resize-none"
                       value={newCandidate.description}
-                      onChange={e => setNewCandidate({...newCandidate, description: e.target.value})}
+                      onChange={e => setNewCandidate({ ...newCandidate, description: e.target.value })}
                     />
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-[2rem] p-6 bg-white/5 hover:bg-white/10 transition-colors group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                  <input 
-                    type="file" 
-                    hidden 
-                    ref={fileInputRef} 
-                    accept="image/*" 
-                    onChange={handleImageUpload} 
+                  <input
+                    type="file"
+                    hidden
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={handleImageUpload}
                   />
                   {newCandidate.image ? (
                     <div className="relative w-full h-full aspect-square rounded-2xl overflow-hidden">
@@ -353,13 +352,13 @@ const AdminPanel = ({ candidates, users, votes }: {
                   )}
                 </div>
               </div>
-              
-              <button 
-                type="submit" 
+
+              <button
+                type="submit"
                 disabled={uploading || !newCandidate.name}
                 className="w-full gold-button py-5 rounded-2xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Plus className="w-5 h-5" /> 
+                <Plus className="w-5 h-5" />
                 <span className="uppercase tracking-[0.3em] text-sm">Enregistrer la Candidate</span>
               </button>
             </form>
@@ -374,7 +373,7 @@ const AdminPanel = ({ candidates, users, votes }: {
                     <p className="font-serif font-black text-white text-lg">{c.name}</p>
                     <p className="text-[10px] text-gold-500 font-black uppercase tracking-widest">{c.voteCount} voix</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => dbService.deleteCandidate(c.id)}
                     className="p-3 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                   >
@@ -387,7 +386,7 @@ const AdminPanel = ({ candidates, users, votes }: {
         )}
 
         {activeTab === 'users' && (
-          <motion.div 
+          <motion.div
             key="users"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -427,7 +426,7 @@ const AdminPanel = ({ candidates, users, votes }: {
           </motion.div>
         )}
         {activeTab === 'admins' && (
-          <motion.div 
+          <motion.div
             key="admins"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -437,17 +436,17 @@ const AdminPanel = ({ candidates, users, votes }: {
             <form onSubmit={handleAddAdminEmail} className="glass-card p-8 rounded-[2rem] flex flex-col md:flex-row gap-4">
               <div className="flex-grow">
                 <label className="block text-[10px] font-black text-gold-500 uppercase tracking-widest mb-2">Email du nouvel administrateur</label>
-                <input 
-                  type="email" 
-                  placeholder="Ex: admin@gmail.com" 
+                <input
+                  type="email"
+                  placeholder="Ex: admin@gmail.com"
                   className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-2xl text-white focus:ring-2 focus:ring-gold-500 outline-none transition-all"
                   value={newAdminEmail}
                   onChange={e => setNewAdminEmail(e.target.value)}
                   required
                 />
               </div>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="gold-button px-8 py-4 rounded-2xl self-end flex items-center gap-2"
               >
                 <Plus className="w-5 h-5" />
@@ -463,7 +462,7 @@ const AdminPanel = ({ candidates, users, votes }: {
                     <p className="text-[10px] text-slate-500 uppercase tracking-widest">Ajouté par {admin.addedBy}</p>
                   </div>
                   {admin.email !== 'angekapel007@gmail.com' && (
-                    <button 
+                    <button
                       onClick={() => dbService.removeAdminEmail(admin.email)}
                       className="p-3 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                     >
@@ -488,10 +487,11 @@ export default function App() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [votes, setVotes] = useState<Vote[]>([]);
+  const [userVote, setUserVote] = useState<Vote | null>(null);
   const [loading, setLoading] = useState(true);
   const [voting, setVoting] = useState(false);
   const [view, setView] = useState<'vote' | 'admin'>('vote');
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showEmailLogin, setShowEmailLogin] = useState(false);
@@ -502,13 +502,13 @@ export default function App() {
       if (firebaseUser) {
         try {
           let userProfile = await dbService.getUserProfile(firebaseUser.uid);
-          
+
           // Auto-upgrade admin role if needed
           if (firebaseUser.email === 'angekapel007@gmail.com' && userProfile?.role !== 'admin') {
             await dbService.updateUserProfile(firebaseUser.uid, { role: 'admin' });
             userProfile = await dbService.getUserProfile(firebaseUser.uid);
           }
-          
+
           setProfile(userProfile);
           if (userProfile?.role === 'admin') setView('admin');
         } catch (err) {
@@ -546,6 +546,14 @@ export default function App() {
     }
   }, [profile]);
 
+  useEffect(() => {
+    if (user && profile?.hasVoted) {
+      dbService.getUserVote(user.uid).then(setUserVote);
+    } else {
+      setUserVote(null);
+    }
+  }, [user, profile?.hasVoted]);
+
   const handleLogin = async () => {
     try {
       await authService.signInWithGoogle();
@@ -572,7 +580,7 @@ export default function App() {
 
   const handleVote = async (candidateId: string) => {
     if (!user || profile?.hasVoted) return;
-    
+
     setVoting(true);
     try {
       await dbService.castVote(user.uid, candidateId);
@@ -589,11 +597,31 @@ export default function App() {
     }
   };
 
+  const handleCancelVote = async () => {
+    if (!user || !userVote || voting) return;
+
+    const confirmCancel = window.confirm("Êtes-vous sûr de vouloir annuler votre vote ? Vous pourrez ensuite voter pour une autre candidate.");
+    if (!confirmCancel) return;
+
+    setVoting(true);
+    try {
+      await dbService.cancelVote(user.uid, userVote.candidateId);
+      const updatedProfile = await dbService.getUserProfile(user.uid);
+      setProfile(updatedProfile);
+      setUserVote(null);
+      toast.success('Vote annulé avec succès');
+    } catch (error) {
+      toast.error("Erreur lors de l'annulation du vote");
+    } finally {
+      setVoting(false);
+    }
+  };
+
   if (loading) return <Loader />;
 
   return (
     <div className="min-h-screen night-bg font-sans text-slate-200 selection:bg-gold-500/30">
-      <Toaster 
+      <Toaster
         position="top-right"
         toastOptions={{
           style: {
@@ -610,7 +638,7 @@ export default function App() {
         {!user ? (
           <div className="flex flex-col items-center justify-center py-20 text-center relative">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold-500/5 blur-[120px] rounded-full -z-10" />
-            
+
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -620,17 +648,17 @@ export default function App() {
                 <Sparkles className="w-4 h-4 text-gold-500" />
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gold-500">Événement de Prestige</span>
               </div>
-              
+
               <h1 className="text-6xl sm:text-8xl font-serif font-black text-white tracking-tighter mb-8 leading-[0.9]">
                 Soirée de Gala <br />
                 <span className="gold-gradient">FS Bertoua</span>
               </h1>
-              
+
               <p className="text-xl text-slate-400 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
                 Une nuit d'élégance et de distinction. <br />
                 Soutenez l'excellence en votant pour votre candidate favorite.
               </p>
-              
+
               <div className="space-y-8 max-w-md mx-auto">
                 <button
                   onClick={handleLogin}
@@ -646,7 +674,7 @@ export default function App() {
                 </div>
 
                 {!showEmailLogin ? (
-                  <button 
+                  <button
                     onClick={() => setShowEmailLogin(true)}
                     className="text-gold-500 font-black uppercase tracking-widest text-xs hover:text-gold-400 transition-colors"
                   >
@@ -656,8 +684,8 @@ export default function App() {
                   <form onSubmit={handleEmailLogin} className="space-y-5 text-left glass-card p-10 rounded-[2.5rem] border border-white/10">
                     <div>
                       <label className="block text-[10px] font-black text-gold-500 uppercase tracking-[0.2em] mb-2">Adresse Email</label>
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         required
                         className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-2xl text-white focus:ring-2 focus:ring-gold-500 outline-none transition-all"
                         value={email}
@@ -666,22 +694,22 @@ export default function App() {
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-gold-500 uppercase tracking-[0.2em] mb-2">Mot de Passe</label>
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         required
                         className="w-full bg-white/5 border border-white/10 px-5 py-4 rounded-2xl text-white focus:ring-2 focus:ring-gold-500 outline-none transition-all"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                       />
                     </div>
-                    <button 
+                    <button
                       type="submit"
                       className="w-full gold-button py-5 rounded-2xl flex items-center justify-center gap-3"
                     >
                       <span>Se Connecter</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setShowEmailLogin(false)}
                       className="w-full text-slate-500 text-xs font-black uppercase tracking-widest hover:text-white transition-colors"
@@ -709,8 +737,8 @@ export default function App() {
                       <span className="gold-gradient">{profile?.hasVoted ? "Participation" : "Soutien"}</span>
                     </h2>
                     <p className="text-slate-400 max-w-xl mx-auto mt-6 text-lg font-medium leading-relaxed">
-                      {profile?.hasVoted 
-                        ? "Votre voix a été enregistrée avec succès. Les résultats seront proclamés lors de la cérémonie de clôture." 
+                      {profile?.hasVoted
+                        ? "Votre voix a été enregistrée avec succès. Les résultats seront proclamés lors de la cérémonie de clôture."
                         : "Chaque vote compte. Choisissez la candidate qui incarne le mieux les valeurs de notre faculté."}
                     </p>
                   </motion.div>
@@ -718,12 +746,12 @@ export default function App() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                   {candidates.map((candidate: Candidate) => (
-                    <CandidateCard 
-                      key={candidate.id} 
-                      candidate={candidate} 
+                    <CandidateCard
+                      key={candidate.id}
+                      candidate={candidate}
                       onVote={handleVote}
                       disabled={voting || profile?.hasVoted || false}
-                      hasVoted={profile?.hasVoted || false}
+                      hasVoted={userVote?.candidateId === candidate.id}
                     />
                   ))}
                   {candidates.length === 0 && (
@@ -733,6 +761,22 @@ export default function App() {
                     </div>
                   )}
                 </div>
+
+                {profile?.hasVoted && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex justify-center mt-12"
+                  >
+                    <button
+                      onClick={handleCancelVote}
+                      disabled={voting}
+                      className="text-red-500 font-black uppercase tracking-widest text-xs hover:text-red-400 transition-colors flex items-center gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" /> Annuler mon vote pour changer de choix
+                    </button>
+                  </motion.div>
+                )}
               </div>
             )}
           </div>
