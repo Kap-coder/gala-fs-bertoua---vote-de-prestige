@@ -135,7 +135,7 @@ const CandidateCard: React.FC<{
       <div className="absolute bottom-0 left-0 right-0 p-8">
         <h3 className="text-3xl font-serif font-black text-white mb-1 leading-tight">{candidate.name}</h3>
         <div className="w-12 h-1 bg-gold-500 mb-4 rounded-full" />
-        <p className="text-slate-300 text-sm line-clamp-2 font-medium leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <p className="text-slate-300 text-sm font-medium leading-relaxed">
           {candidate.description}
         </p>
       </div>
