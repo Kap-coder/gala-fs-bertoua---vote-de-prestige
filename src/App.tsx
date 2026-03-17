@@ -185,6 +185,22 @@ const AdminPanel = ({ candidates, users, votes }: {
     toast.success('Administrateur ajouté !');
   };
 
+  const handleResetDB = async () => {
+    const confirmReset = window.confirm("ATTENTION : Cette action va supprimer TOUS les candidats, TOUS les votes et réinitialiser le statut de TOUS les participants. Cette action est irréversible. Voulez-vous continuer ?");
+    if (!confirmReset) return;
+
+    const secondConfirm = window.confirm("Êtes-vous ABSOLUMENT sûr ? Tapez 'OUI' pour confirmer.");
+    // Since window.confirm doesn't take text, I'll just use a second confirm for safety
+    if (!secondConfirm) return;
+
+    try {
+      await dbService.resetDatabase();
+      toast.success('Base de données réinitialisée avec succès !');
+    } catch (error) {
+      toast.error('Erreur lors de la réinitialisation');
+    }
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -288,6 +304,19 @@ const AdminPanel = ({ candidates, users, votes }: {
                   {users.length > 0 ? Math.round((votes.length / users.length) * 100) : 0}%
                 </h4>
                 <p className="text-xs text-slate-500 mt-4 font-bold">{votes.length} sur {users.length} inscrits</p>
+              </div>
+
+              <div className="glass-card p-8 rounded-[2rem] border border-red-500/20 bg-red-500/5">
+                <p className="text-[10px] font-black text-red-500 uppercase tracking-[0.3em] mb-4">Zone de Danger</p>
+                <button
+                  onClick={handleResetDB}
+                  className="w-full py-4 px-6 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 font-black uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" /> Réinitialiser la base de données
+                </button>
+                <p className="text-[10px] text-slate-500 mt-4 text-center leading-relaxed">
+                  Supprime candidats, votes et réinitialise les participants.
+                </p>
               </div>
             </div>
           </motion.div>

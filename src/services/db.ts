@@ -252,5 +252,29 @@ export const dbService = {
     } catch (error) {
       return false;
     }
+  },
+
+  async resetDatabase() {
+    try {
+      const batch = writeBatch(db);
+
+      // 1. Delete all votes
+      const votesSnapshot = await getDocs(collection(db, 'votes'));
+      votesSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+
+      // 2. Delete all candidates
+      const candidatesSnapshot = await getDocs(collection(db, 'candidates'));
+      candidatesSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+
+      // 3. Reset all users hasVoted status
+      const usersSnapshot = await getDocs(collection(db, 'users'));
+      usersSnapshot.docs.forEach(userDoc => {
+        batch.update(userDoc.ref, { hasVoted: false });
+      });
+
+      await batch.commit();
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'reset-database');
+    }
   }
 };
