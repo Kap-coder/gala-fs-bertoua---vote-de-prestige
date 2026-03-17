@@ -1,0 +1,70 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and voting status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "hasVoted": { "type": "boolean" },
+        "role": { "type": "string", "enum": ["user", "admin"] }
+      },
+      "required": ["id", "email", "hasVoted"]
+    },
+    "Candidate": {
+      "title": "Candidate",
+      "description": "Candidate for the cultural evening",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "voteCount": { "type": "integer" }
+      },
+      "required": ["name", "voteCount"]
+    },
+    "Vote": {
+      "title": "Vote",
+      "description": "A single vote cast by a user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "candidateId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "candidateId", "timestamp"]
+    },
+    "AdminEmail": {
+      "title": "Admin Email",
+      "description": "Whitelisted email for admin access",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "addedBy": { "type": "string" },
+        "addedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/candidates/{candidateId}": {
+      "schema": "Candidate",
+      "description": "List of candidates"
+    },
+    "/votes/{voteId}": {
+      "schema": "Vote",
+      "description": "Record of votes cast"
+    },
+    "/admin_emails/{email}": {
+      "schema": "AdminEmail",
+      "description": "Whitelisted admin emails"
+    }
+  }
+}

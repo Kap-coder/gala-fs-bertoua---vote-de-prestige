@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: users
+    //   - id: string (required)
+    //   - name: string
+    //   - email: string (required)
+    //   - hasVoted: bool (required)
+    //   - role: string (user|admin)
+    //
+    // Collection: candidates
+    //   - name: string (required)
+    //   - description: string
+    //   - image: string
+    //   - voteCount: number (required)
+    //
+    // Collection: votes
+    //   - userId: string (required)
+    //   - candidateId: string (required)
+    //   - timestamp: timestamp (required)
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "angekapel007@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'name', 'email', 'hasVoted', 'role']) &&
+             data.id is string &&
+             data.name is string &&
+             data.email is string &&
+             data.hasVoted is bool &&
+             data.role in ['user', 'admin'];
+    }
+
+    function isValidVote(data) {
+      return data.keys().hasAll(['userId', 'candidateId', 'timestamp']) &&
+             data.userId == request.auth.uid &&
+             data.candidateId is string &&
+             data.timestamp is timestamp;
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && 
+        (request.resource.data.role == 'user' || 
+         (request.resource.data.role == 'admin' && request.auth.token.email == "angekapel007@gmail.com" && request.auth.token.email_verified == true));
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasVoted']) && resource.data.hasVoted == false);
+    }
+
+    match /candidates/{candidateId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+      
+      // Special rule for incrementing vote count via batch/transaction
+      allow update: if isAuthenticated() && 
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voteCount']) &&
+                    request.resource.data.voteCount == resource.data.voteCount + 1;
+    }
+
+    match /votes/{voteId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && 
+                    isValidVote(request.resource.data) &&
+                    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.hasVoted == false;
+    }
+
+    match /admin_emails/{email} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
